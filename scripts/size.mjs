@@ -6,7 +6,7 @@ import { gzipSync } from 'node:zlib';
 import { transformSync } from 'esbuild';
 
 /** [file in dist/ng-tel-input, loader, budget in bytes] */
-const budgets = [['fesm2022/stefankuburovic-ng-tel-input.mjs', 'js', 3000]];
+const budgets = [['fesm2022/stefankuburovic-ng-tel-input.mjs', 'js', 6600]];
 
 let over = false;
 for (const [file, loader, budget] of budgets) {

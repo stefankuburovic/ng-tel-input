@@ -1,6 +1,10 @@
 import { InjectionToken, LOCALE_ID, Provider, inject } from '@angular/core';
+import type { Examples } from 'libphonenumber-js';
 
-/** App-wide defaults for `telInput` and `tel-country-select`, set with {@link provideTelInput}. */
+/**
+ * App-wide defaults for `telInput`, `tel-country-select` and `tel-country-menu`, set with
+ * {@link provideTelInput}.
+ */
 export interface TelInputOptions {
   /**
    * The country a national number is read in until the user picks another, as an ISO code in
@@ -9,6 +13,11 @@ export interface TelInputOptions {
   defaultCountry?: string;
   /** Countries listed first in the picker, in this order. */
   preferredCountries?: readonly string[];
+  /**
+   * Example numbers for the placeholder, `import examples from 'libphonenumber-js/mobile/examples'`
+   * (about 1.4 kB gzipped). Left out, fields show no example.
+   */
+  examples?: Examples;
 }
 
 /** Holds what {@link provideTelInput} set. */

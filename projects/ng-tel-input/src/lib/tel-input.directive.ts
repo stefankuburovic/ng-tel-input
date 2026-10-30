@@ -1,6 +1,6 @@
-import { Directive, ElementRef, computed, forwardRef, inject, input, signal } from '@angular/core';
+import { Directive, ElementRef, HostAttributeToken, computed, effect, forwardRef, inject, input, signal } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
-import { CountryCode } from 'libphonenumber-js';
+import { CountryCode, Examples, getExampleNumber } from 'libphonenumber-js';
 
 import { injectTelInputOptions } from './tel-input-config';
 import { localeCountry, parseTel, telDisplay, telErrors, telValue, toCountryCode } from './tel-format';
@@ -23,6 +23,9 @@ import { localeCountry, parseTel, telDisplay, telErrors, telValue, toCountryCode
  *
  * Also a validator: `invalidNumber` or `numberTooLong`, never for an empty field (pair it with
  * `Validators.required` for that).
+ *
+ * With `examples` (from `libphonenumber-js/mobile/examples`), a field with no placeholder of its
+ * own shows an example number of the selected country.
  */
 @Directive({
   selector: 'input[telInput]',
@@ -41,6 +44,11 @@ import { localeCountry, parseTel, telDisplay, telErrors, telValue, toCountryCode
 export class TelInputDirective implements ControlValueAccessor, Validator {
   /** The country a national number is read in until the user picks one; ISO code, either case. */
   readonly defaultCountry = input<string>();
+  /**
+   * Example numbers, `import examples from 'libphonenumber-js/mobile/examples'`: the field shows
+   * the selected country's as its placeholder. Left out, nothing is shipped for them.
+   */
+  readonly examples = input<Examples>();
 
   /** What {@link provideTelInput} and `LOCALE_ID` set, read once. */
   private readonly options = injectTelInputOptions();
@@ -52,6 +60,16 @@ export class TelInputDirective implements ControlValueAccessor, Validator {
   );
   /** Mirrors the control's disabled state, so the country picker can follow it. */
   readonly disabled = signal(false);
+  /** The value the control has, as a signal for {@link e164}. */
+  private readonly current = signal('');
+  /**
+   * The number in E.164 (`+49301234567`) while it is a valid one, else `undefined`: what a
+   * `tel:` link dials (`tel-call-link`).
+   */
+  readonly e164 = computed(() => {
+    const number = parseTel(this.current(), this.country());
+    return number?.isValid() ? number.number : undefined;
+  });
 
   /** The element the directive sits on. */
   private readonly element: HTMLInputElement = inject(ElementRef<HTMLInputElement>).nativeElement;
@@ -63,11 +81,24 @@ export class TelInputDirective implements ControlValueAccessor, Validator {
   private onTouched: () => void = () => undefined;
   /** Re-runs the validator; called when the country changes. */
   private onValidatorChange: () => void = () => undefined;
+  /** The placeholder the page gave the field, which an example number never replaces. */
+  private readonly ownPlaceholder = inject(new HostAttributeToken('placeholder'), { optional: true });
+
+  constructor() {
+    effect(() => {
+      const examples = this.examples() ?? this.options.examples;
+      const country = this.country();
+      if (examples && this.ownPlaceholder === null) {
+        this.element.placeholder = (country && getExampleNumber(country, examples)?.formatNational()) ?? '';
+      }
+    });
+  }
 
   /** Shows a value from the model, selecting its country when it has one. */
   writeValue(value: unknown): void {
     const text = typeof value === 'string' ? value : '';
     this.value = text;
+    this.current.set(text);
     const number = parseTel(text, this.country());
     if (number?.country) {
       this.picked.set(number.country);
@@ -137,10 +168,16 @@ export class TelInputDirective implements ControlValueAccessor, Validator {
     this.onTouched();
   }
 
+  /** Puts the focus in the field, as the country menu does once a country is chosen. */
+  focus(): void {
+    this.element.focus();
+  }
+
   /** Hands `value` to the form when it differs from what the control has. */
   private emit(value: string): void {
     if (value !== this.value) {
       this.value = value;
+      this.current.set(value);
       this.onChange(value);
     }
   }
