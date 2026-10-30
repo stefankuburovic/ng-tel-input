@@ -1,0 +1,34 @@
+{
+  "name": "@stefankuburovic/ng-tel-input",
+  "version": "1.0.0",
+  "description": "Phone number input for Angular forms: international value, national display, a native country picker with Intl names and flags, validation. On libphonenumber-js, signals, zoneless, no Material required.",
+  "keywords": [
+    "angular",
+    "phone",
+    "telephone",
+    "tel-input",
+    "intl-tel-input",
+    "libphonenumber",
+    "forms",
+    "zoneless",
+    "signals"
+  ],
+  "license": "MIT",
+  "author": "Stefan Kuburovic",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stefankuburovic/ng-tel-input.git"
+  },
+  "homepage": "https://github.com/stefankuburovic/ng-tel-input#readme",
+  "bugs": {
+    "url": "https://github.com/stefankuburovic/ng-tel-input/issues"
+  },
+  "peerDependencies": {
+    "@angular/core": ">=20.2.0",
+    "@angular/forms": ">=20.2.0"
+  },
+  "sideEffects": false,
+  "dependencies": {
+    "libphonenumber-js": "^1.12.0"
+  }
+}
