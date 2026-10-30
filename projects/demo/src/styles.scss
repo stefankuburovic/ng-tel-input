@@ -25,8 +25,17 @@ mat-form-field {
 }
 
 /* What an app adds once: the picker is text, not a 48px icon button. */
-.mat-mdc-form-field-icon-prefix > tel-country-select {
+.mat-mdc-form-field-icon-prefix > tel-country-select,
+.mat-mdc-form-field-icon-prefix > tel-country-menu {
   padding: 0 8px 0 16px;
+}
+.mat-mdc-form-field-icon-suffix > tel-call-link {
+  padding: 0 8px;
+}
+
+h2 {
+  margin: 24px 0 4px;
+  font: var(--mat-sys-title-medium);
 }
 
 .plain {

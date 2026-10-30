@@ -65,6 +65,33 @@ export function listCountries(locale: string, preferred: readonly string[]): { p
   };
 }
 
+/** Lower case without accents or diacritics, so `osterreich` finds Österreich. */
+function fold(text: string): string {
+  return text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+}
+
+/**
+ * The countries a search finds: those whose name contains `query`, accents and case aside (the
+ * names starting with it first), whose calling code starts with its digits (`+43`, `43`), or whose
+ * ISO code it is. An empty query finds them all, in their order.
+ */
+export function searchCountries(countries: readonly TelCountry[], query: string): TelCountry[] {
+  const folded = fold(query.trim());
+  if (!folded) {
+    return [...countries];
+  }
+  const digits = folded.replace(/^\+/, '');
+  const dial = /^\d+$/.test(digits);
+  const found = countries.filter(
+    country =>
+      fold(country.name).includes(folded) ||
+      country.code.toLowerCase() === folded ||
+      (dial && country.dialCode.startsWith(digits))
+  );
+  // Stable: within each group the list keeps its order.
+  return found.sort((a, b) => Number(!fold(a.name).startsWith(folded)) - Number(!fold(b.name).startsWith(folded)));
+}
+
 /**
  * Reads a number as typed or stored: international (`+49…`, `0049…`) on its own, national under
  * `country`.

@@ -1,7 +1,7 @@
 {
   "name": "@stefankuburovic/ng-tel-input",
-  "version": "1.0.0",
-  "description": "Phone number input for Angular forms: international value, national display, a native country picker with Intl names and flags, validation. On libphonenumber-js, signals, zoneless, no Material required.",
+  "version": "1.1.0",
+  "description": "Phone number input for Angular forms: international value, national display, a native country picker or a searchable menu, with Intl names and flags, validation. On libphonenumber-js, signals, zoneless, no Material required.",
   "keywords": [
     "angular",
     "phone",
